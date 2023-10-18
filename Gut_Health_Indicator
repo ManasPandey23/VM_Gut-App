@@ -1,0 +1,483 @@
+
+library(shiny)
+library(plotly)
+
+food_data <- data.frame(
+  Food = c(
+    "Banana", "Apple", "Bread", "Milk", "Broccoli", 
+    "Strawberries", "Carrots", "Rice", "Chicken", "Salmon",
+    "Yogurt", "Tomato", "Spinach", "Lettuce", "Pasta",
+    "Beef", "Pork", "Eggs", "Potatoes", "Blueberries",
+    "Cucumber", "Green Beans", "Quinoa", "Tofu", "Oranges",
+    "Grapes", "Almonds", "Cabbage", "Oats", "Peppers",
+    "Turkey", "Lamb", "Honey", "Pineapple", "Cherries",
+    "Zucchini", "Walnuts", "Avocado", "Kiwi", "Peanuts",
+    "Butter", "Cauliflower", "Eggplant", "Kale", "Cashews",
+    "Shrimp", "Trout", "Cream", "Peaches", "Raspberries",
+    "Hazelnuts", "Sardines", "Bacon", "Peanut Butter", "Popcorn",
+    "Brown Rice", "White Rice", "Lentils", "Chickpeas", "Black Beans",
+    "Soy Milk", "Beets", "Celery", "Radishes", "Pine Nuts",
+    "Turkey Bacon", "Sausages", "Sour Cream", "Pasta Carbonara", "Sushi"
+  ),
+  Fructans = c(
+    0.56, 0.43, 0.28, 0.05, 0.33,
+    0.17, 0.22, 0.00, 0.00, 0.00,
+    0.38, 0.12, 0.15, 0.05, 0.43,
+    0.03, 0.01, 0.01, 0.13, 0.03,
+    0.34, 0.05, 0.01, 0.01, 0.12,
+    0.07, 0.01, 0.11, 0.16, 0.05,
+    0.03, 0.11, 0.19, 0.12, 0.01,
+    0.03, 0.01, 0.04, 0.01, 0.09,
+    0.00, 0.09, 0.01, 0.00, 0.00,
+    0.00, 0.01, 0.02, 0.00, 0.00,
+    0.03, 0.01, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00
+  ),
+  Lactose = c(
+    0.0, 0.18, 0.34, 4.80, 0.12,
+    0.12, 0.13, 0.00, 0.00, 0.00,
+    4.80, 0.40, 0.19, 0.07, 0.01,
+    0.01, 0.12, 0.04, 0.01, 0.00,
+    0.02, 0.00, 0.09, 0.00, 0.09,
+    0.01, 0.15, 0.07, 0.05, 0.02,
+    0.00, 0.00, 4.80, 0.02, 0.00,
+    0.00, 0.00, 0.02, 0.02, 0.00,
+    0.00, 0.01, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00
+  ),
+  Fructose = c(
+    0.05, 2.40, 1.20, 0.50, 1.07,
+    4.20, 0.60, 0.05, 0.04, 0.00,
+    5.00, 0.50, 0.80, 0.50, 0.90,
+    0.01, 0.01, 0.01, 0.84, 1.60,
+    0.17, 0.01, 0.13, 0.80, 0.70,
+    0.05, 0.02, 0.04, 0.03, 0.11,
+    0.19, 1.00, 0.09, 0.05, 0.02,
+    0.00, 0.00, 0.99, 0.50, 0.02,
+    0.01, 0.00, 0.00, 0.03, 0.01,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00
+  ),
+  Sorbitol = c(
+    0.20, 0.00, 0.00, 0.00, 0.44,
+    0.00, 0.26, 0.00, 0.00, 0.00,
+    0.06, 0.03, 0.01, 0.01, 0.00,
+    0.01, 0.00, 0.00, 0.01, 0.02,
+    0.00, 0.03, 0.06, 0.03, 0.01,
+    0.01, 0.00, 0.00, 0.01, 0.15,
+    0.00, 0.02, 0.05, 0.00, 0.02,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.01, 0.02,
+    0.01, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00
+  ),
+  Mannitol = c(
+    0.00, 0.00, 0.00, 0.00, 0.07,
+    0.00, 0.14, 0.00, 0.00, 0.00,
+    0.01, 0.01, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.02,
+    0.00, 0.01, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.01, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00
+  ),
+  Carbohydrate = c(
+    22.84, 13.81, 50.61, 4.52, 6.64,
+    7.68, 9.58, 27.9, 0.00, 0.00,
+    7.0, 3.92, 3.63, 2.97, 24.93,
+    0.0, 0.0, 0.77, 19.36, 14.49,
+    3.63, 7.13, 68.9, 1.88, 11.75,
+    18.1, 19.74, 5.8, 66.27, 6.03,
+    0.00, 0.00, 82.4, 12.63, 16.01,
+    3.11, 13.71, 8.53, 14.66, 16.13,
+    0.06, 5.3, 5.7, 4.42, 30.19,
+    1.24, 0.49, 2.79, 9.54, 11.94,
+    16.7, 0.0, 1.43, 19.56, 77.78,
+    22.78, 27.9, 60.08, 29.98, 62.36,
+    4.93, 9.56, 2.97, 3.4, 13.08,
+    3.1, 0.0, 4.27, 25.72, 29.9
+    
+  ),
+  Dietary_Fiber = c(
+    2.6, 2.4, 2.4, 0.0, 2.6,
+    2.0, 2.8, 0.4, 0.0, 0.0,
+    0.0, 1.2, 2.8, 2.2, 1.2,
+    0.0, 0.0, 0.0, 1.7, 2.4,
+    0.5, 3.4, 5.9, 0.3, 2.2,
+    0.9, 11.8, 2.3, 10.6, 2.0,
+    0.0, 0.0, 0.2, 1.4, 2.1,
+    1.0, 6.7, 6.70, 3.0, 8.5,
+    0.0, 2.5, 3.4, 2.0, 3.3,
+    0.0, 0.0, 0.0, 1.5, 6.5,
+    9.70, 0.0, 0.0, 6.0, 14.5,
+    1.8, 0.4, 30.5, 8.6, 15.2,
+    1.3, 2.8, 1.6, 1.6, 3.7,
+    0.0, 0.0, 0.0, 1.5, 1.2
+  )
+)
+# Replace missing values with zeros
+food_data[is.na(food_data)] <- 0
+
+# UI
+ui <- fluidPage(
+  titlePanel("Gut Health Indicator App"),
+  
+  # Page 1: Gut Health Assessment
+  tabsetPanel(
+    tabPanel("Gut Health Assessment & General Recommendation ",
+             sidebarLayout(
+               sidebarPanel(
+                 selectInput("foods", "Select Foods:", choices = food_data$Food, multiple = TRUE),
+                 numericInput("portion", "Servings Size (100 grams):", value = 1, min = 0, max = 20),
+                 br(),
+                 helpText("Select foods,you consume daily and specify  Servings  to calculate indicators."),
+                 br(),
+                 textOutput("fodmap_score"),
+                 textOutput("dietary_fiber_indicator"),
+                 textOutput("carb_indicator"),
+                 textOutput("probiotic_prebiotic_indicator"),
+                 textOutput("recommendation")
+               ),
+               
+               mainPanel(
+                 tabsetPanel(
+                   tabPanel("Gut Health Indicator", verbatimTextOutput("recommendation_output")),
+                   p("This app calculates various gut health indicators based on selected foods and lifestyle factors."),
+                   br(),
+                   p("FODMAP (Fermentable Oligosaccharides, Disaccharides, Monosaccharides, and Polyols) score is a measure of the potential impact of certain carbohydrates on digestive health."),
+                   
+                   p("FODMAP Score: Lower is better. Low (0-10), Moderate (10-20), High (20+).Very High(25+)",
+                     p("Dietary Fiber: Sufficient (> 25 grams/day), Insufficient (<= 25 grams/day)."),
+                     p("Carbohydrate: Low (< 45% of total daily calories), Moderate (45-65%), High (> 65%)."),
+                     p("Probiotic & Prebiotic: Sufficient (included in diet), Insufficient (not included)."),
+                     br()
+                   )
+                 ),
+                 
+                 
+                 # Gut Health scoring
+                 sidebarLayout(
+                   sidebarPanel(
+                     # Input widgets for different factors (diet, exercise, sleep, stress, etc.)
+                     numericInput("fiber_intake", "Daily Fiber Intake (g):", value = 25, min = 0, max = 100),
+                     numericInput("exercise_minutes", "Weekly Exercise Minutes:", value = 150, min = 0, max = 500),
+                     numericInput("sleep_quality", "Sleep Quality (0-10):", value = 7, min = 0, max = 10),
+                     numericInput("stress_level", "Stress Level (0-10):", value = 3, min = 0, max = 10),
+                     numericInput("fruits_veg_servings", "Fruits & Veg Servings:", value = 4, min = 0, max = 10),
+                     numericInput("water_intake", "Daily Water Intake (l):", value = 2, min = 0, max = 10),
+                     numericInput("probiotic_intake", "Probiotic Intake (daily serving):", value = 1, min = 0, max = 5),
+                     numericInput("prebiotic_intake", "Prebiotic Intake (daily serving):", value = 1, min = 0, max = 5),
+                     numericInput("food_diversity", "Food Diversity Score (0-10):", value = 5, min = 0, max = 10),
+                     selectInput("food_allergy", "Food Allergy?", choices = c("No", "Yes")),
+                     numericInput("antibiotic_use", "Recent Antibiotic Use?", value = 0, min = 0, max = 1),
+                     actionButton("calculate_score", "Calculate Gut Health Score"),
+                     actionButton("submit_general_info", "Submit General Recommendations"),
+                     
+                   ),
+                   
+                   mainPanel(
+                     # Display gut health scores as a bar chart and pie chart
+                     h3("Your Comprehensive Gut Health Scores"),
+                     plotOutput("gut_health_bar_chart"),
+                     plotlyOutput("gut_health_pie_chart"),
+                     h3("General Recommendations for Better Gut Health"),
+                     verbatimTextOutput("general_recommendations_output")
+                     
+                   )
+                 )
+               )
+             )
+    )
+  )   
+)
+# Server
+
+server <- function(input, output)  {
+  selected_foods <- reactive({
+    food_data[food_data$Food %in% input$foods, ]
+  })
+  
+  fodmap_score <- reactive({
+    if (length(selected_foods()) == 0) {
+      return(NULL)
+    }
+    
+    fructans <- sum(selected_foods()$Fructans * input$portion)
+    lactose <- sum(selected_foods()$Lactose * input$portion)
+    fructose <- sum(selected_foods()$Fructose * input$portion)
+    sorbitol <- sum(selected_foods()$Sorbitol * input$portion)
+    mannitol <- sum(selected_foods()$Mannitol * input$portion)
+    
+    fodmap_total <- fructans + lactose + fructose + sorbitol + mannitol
+    fodmap_total
+  })
+  
+  dietary_fiber_indicator <- reactive({
+    if (length(selected_foods()) == 0) {
+      return(NULL)
+    }
+    
+    fiber <- sum(selected_foods()$Dietary_Fiber * input$portion)
+    
+    if (fiber > 25) {
+      "Sufficient"
+    } else {
+      "Insufficient"
+    }
+  })
+  
+  carb_indicator <- reactive({
+    if (length(selected_foods()) == 0) {
+      return(NULL)
+    }
+    
+    carbs <- sum(selected_foods()$Carbohydrate * input$portion)
+    
+    if (carbs<= 225) {
+      "Low"
+    } else if (carbs <= 325) {
+      "Moderate"
+    } else {
+      "High"
+    }
+  })
+  
+  probiotic_prebiotic_indicator <- reactive({
+    if (length(selected_foods()) == 0) {
+      return(NULL)
+    }
+    
+    if ("Yogurt" %in% input$foods && "Banana"%in% input$foods) {
+      "Sufficient"
+    } else if("Yogurt" %in% input$foods && "Apple"%in% input$foods){
+      "Sufficient"
+    } else if("Yogurt" %in% input$foods && "Lentils"%in% input$foods){ 
+      "Sufficient"
+    } else if("Yogurt" %in% input$foods && "Oats"%in% input$foods){ 
+      "Sufficient"
+    } else if("Sour Cream" %in% input$foods && "Oats"%in% input$foods){ 
+      "Sufficient"
+    } else {
+      "Insufficient"
+    }
+  })
+  
+  recommendation <- reactive({
+    if (!is.null(fodmap_score()) && !is.null(dietary_fiber_indicator()) &&
+        !is.null(carb_indicator()) && !is.null(probiotic_prebiotic_indicator())) {
+      
+      fodmap_score <- fodmap_score()
+      fiber_indicator <- dietary_fiber_indicator()
+      carb_indicator <- carb_indicator()
+      probiotic_prebiotic_indicator <- probiotic_prebiotic_indicator()
+      
+      # Customize recommendations based on the indicators
+      recommendation_text <- paste("FODMAP Score:", fodmap_score, "\n")
+      recommendation_text <- paste(recommendation_text, "Dietary Fiber:", fiber_indicator, "\n")
+      recommendation_text <- paste(recommendation_text, "Carbohydrate:", carb_indicator, "\n")
+      recommendation_text <- paste(recommendation_text, "Probiotic & Prebiotic:", probiotic_prebiotic_indicator)
+      
+      recommendation_text
+    }
+  })
+  
+  output$fodmap_score <- renderText({
+    if (!is.null(fodmap_score())) {
+      paste("FODMAP Score:", round(fodmap_score(), 2))
+    }
+  })
+  
+  output$dietary_fiber_indicator <- renderText({
+    if (!is.null(dietary_fiber_indicator())) {
+      paste("Dietary Fiber:", dietary_fiber_indicator())
+    }
+  })
+  
+  output$carb_indicator <- renderText({
+    if (!is.null(carb_indicator())) {
+      paste("Carbohydrate:", carb_indicator())
+    }
+  })
+  
+  output$probiotic_prebiotic_indicator <- renderText({
+    if (!is.null(probiotic_prebiotic_indicator())) {
+      paste("Probiotic & Prebiotic:", probiotic_prebiotic_indicator())
+    }
+  })
+  
+  # Calculate serving size recommendations for FODMAP goals
+  
+  fodmap_recommendation <- reactive({
+    
+    if (!is.null(fodmap_score()) && fodmap_score() <= 10) {
+      return("Low FODMAP Load, Good for Gut Health, Continue your Diet")
+    } else if (fodmap_score() <= 20) {
+      return("Moderate FODMAP Load, Monitor Intake") 
+    } else if (fodmap_score() <= 25) {
+      return("High FODMAP Load, Increase servings of foods low in FODMAPs like rice, chicken, and potatoes.")
+    } else {
+      return("Very High FODMAP Load (Possible IBS Symptoms,Consult a Dietitian")
+    }
+  })
+  
+  
+  # Calculate serving size recommendations for dietary goals
+  serving_size_fiber_recommendation <- reactive({
+    if (!is.null(dietary_fiber_indicator()) && dietary_fiber_indicator() == "Insufficient") {
+      "Increase servings of foods high in dietary fiber like beans, broccoli, and whole grains."
+    } else {
+      "No specific serving size recommendations for dietary fiber."
+    }
+  })
+  
+  carb_recommendation <- reactive({
+    if (!is.null(carb_indicator()) && carb_indicator() == "Low") {
+      "Increase servings of foods rich in carbohydrates like rice, pasta, and bread."
+    } else if(carb_indicator() == "Moderate") {
+      "No specific serving size recommendations for carbohydrates."
+    }else {
+      "High intake of carbohydrates can be associated with a lower diet quality and a higher risk of developing chronic diseases such as obesity, heart disease, and type 2 diabetes.Consult a Doctor."  
+    }
+  })
+  
+  serving_size_probiotic_recommendation <- reactive({
+    if (!is.null(probiotic_prebiotic_indicator()) && probiotic_prebiotic_indicator() == "Insufficient") {
+      "Increase servings of foods containing probiotics and prebiotics like yogurt, Kefir, Kombucha, Miso and garlic."
+    } else {
+      "No specific serving size recommendations for probiotics & prebiotics."
+    }
+  })
+  
+  # Modify the recommendation output to include serving size recommendations
+  output$recommendation_output <- renderText({
+    if (!is.null(recommendation())) {
+      recommendation_text <- recommendation()
+      
+      # Append all recommendations
+      recommendation_text <- paste("Recommendations:\n\n", recommendation_text)
+      recommendation_text <- paste(recommendation_text, "\n\ FODMAP Score Recommendation:", fodmap_recommendation())
+      recommendation_text <- paste(recommendation_text, "\n\nDietary Fiber Recommendation:", serving_size_fiber_recommendation())
+      recommendation_text <- paste(recommendation_text, "\n\nCarbohydrate Recommendation:", carb_recommendation())
+      recommendation_text <- paste(recommendation_text, "\n\nProbiotic & Prebiotic Recommendation:", serving_size_probiotic_recommendation())
+      
+      recommendation_text
+    }
+  })
+  # ...
+  
+  # General Recommendations
+  observeEvent(input$submit_general_info, {
+    fiber_intake<-input$fiber_intake
+    exercise_minutes<-input$exercise_minutes
+    sleep_quality <- input$sleep_quality
+    stress_level <- input$stress_level
+    fruits_veg_servings<-input$fruits_veg_servings
+    water_intake <- input$water_intake
+    probiotic_intake <- input$probiotic_intake
+    prebiotic_intake <- input$prebiotic_intake
+    food_diversity<-input$food_diversity
+    food_allergy<-input$food_allergy
+    antibiotic_use <- input$antibiotic_use
+    
+    
+    # Generate general recommendations based on user inputs
+    recommendations <- list(
+      paste("Dietary_Fiber_Intake:", ifelse(fiber_intake < 25, "Low fiber intake and inadequate water intake can contribute to constipation.", "Your lifestyle factors appear to be supportive of regular bowel movements.")),
+      paste("Weekly Exercise Minutes:",ifelse(exercise_minutes >= 150, "Your physical exercise is sufficient to support gut health.", "Consider increasing your weekly exercise to at least 150 minutes for better gut health.")),
+      paste("Sleep Quality:", ifelse(sleep_quality >= 7, "You seem to have good sleep quality, which positively impacts gut health.", "Prioritize improving sleep habits and sleep quality for better gut health.")),
+      paste("Stress Management:", ifelse(stress_level <= 5, "Your stress level appears manageable, which is beneficial for gut health.", "Implement stress management techniques like mindfulness or meditation to support gut health.")),
+      paste(" DailY_fruits_veg_servings:", ifelse(fruits_veg_servings >= 4, "Your fruits and vegetables intake is sufficient for good gut health.", "Consider increasing your fruits and vegetables intake to support gut health.")),
+      paste(" DailY_Water_Intake:", ifelse(water_intake >= 2, "Adequate hydration is important for maintaining a healthy gut. Your daily water intake seems sufficient.", "Ensure you drink enough water daily for better gut health.")),
+      paste("Probiotic & Prebiotic Intake:", ifelse(probiotic_intake >= 1 & prebiotic_intake >= 1, "Adequate intake of probiotics and prebiotics supports a healthy gut microbiome.", "Consider incorporating probiotic-rich and prebiotic-rich foods in your diet for better gut health.")),
+      paste("Food Diversity:", ifelse(food_diversity >= 5, "A diverse diet supports gut microbiome diversity and overall gut health.", "Include a variety of foods in your diet for better gut health.")),
+      paste("Food allergy:", ifelse(food_allergy == "Yes","Having allergies can impact gut health. If you suspect any food allergies, consult a healthcare professional for evaluation and appropriate dietary modifications.", "Not having allergies can be beneficial for gut health.")), 
+      paste("Antibiotic Use:", ifelse(antibiotic_use == "Yes", "Antibiotics can disrupt the gut microbiome. If you have recently taken antibiotics, consider supporting your gut with probiotics and prebiotics.", "If you haven't taken antibiotics recently, continue to prioritize gut-friendly foods."))
+      
+      
+    )
+    
+    output$general_recommendations_output <- renderText(paste(recommendations, collapse = "\n\n"))
+  })
+  
+  
+  # Calculate individual scores based on input and criteria
+  scores <- reactive({
+    data <- data.frame(
+      Factor = c("Fiber Intake", "Exercise", "Sleep Quality", "Stress Level", "Fruits & Veg Servings", "Daily Water Intake", "Probiotic Intake", "Prebiotic Intake",
+                 "Food Diversity", "Food Allergy", "Antibiotic Use"),
+      Score = c(
+        input$fiber_intake /100 ,  # Normalize exercise minutes to a 0-1 scale
+        input$exercise_minutes / 600 ,  # Normalize exercise minutes to a 0-1 scale
+        input$sleep_quality /28 ,  # Normalize sleep quality to a 0-1 scale
+        input$stress_level / -16 ,  # Normalize stress level to a -1,0 scale
+        input$fruits_veg_servings / 16 ,  # Normalize fruits & veg servings to a 0-1 scale
+        input$water_intake / 8 ,  # Normalize daily water intake to a 0-1 scale
+        input$probiotic_intake / 4 ,  # Normalize probiotic intake to a 0-1 scale
+        input$prebiotic_intake / 4 ,  # Normalize prebiotic intake to a 0-1 scale
+        input$food_diversity / 20,  # Normalize food diversity to a 0-1 scale
+        ifelse(input$food_allergy == "Yes", -.25,0),  # Food allergy (0 for Yes, 1 for No)
+        ifelse(input$antibiotic_use == 1,-.25,0)  # Antibiotic use (0 for Yes, 1 for No)
+      )
+    )
+    
+    
+    # Calculate overall gut health score
+    gut_health_score <-max(0,sum(data$Score)/3.0)
+    
+    gut_health_score=min(gut_health_score,1)
+    list(Data = data, Gut_Health_Score = gut_health_score)
+  })
+  
+  # Display bar chart for individual factors with colors
+  output$gut_health_bar_chart <- renderPlot({
+    data <- scores()$Data
+    color <- ifelse(data$Score >= 0.25, "green", "red")  
+    
+    # Create a bar chart with colored bars
+    bar_chart <- barplot(data$Score, names.arg = data$Factor, col = color,
+                         main = "Gut Health Scores", xlab = "Factors", ylab = "Score",
+                         ylim = c(-1, 1))
+    
+    # Print overall gut health score
+    
+  })
+  
+  # Display pie chart for overall gut health
+  output$gut_health_pie_chart <- renderPlotly({
+    overall_score <- round(scores()$Gut_Health_Score, 3)
+    color <- ifelse(overall_score >= 0.5 , "green", "red")  # Green for good, red for bad
+    
+    pie_chart_data <- data.frame(Label = "Gut Health", Value = overall_score, Color = color)
+    
+    pie_chart <- plot_ly(pie_chart_data, labels = ~Label, values = ~Value, type = "pie",
+                         textinfo = " percent", marker = list(colors = ~Color))
+    
+    pie_chart <- pie_chart %>% layout(title = "Overall Gut Health")
+    
+    pie_chart
+  })
+} 
+
+
+
+# Run the app
+shinyApp(ui, server)
+#____________________________________________________________________________________________
